@@ -47,14 +47,9 @@ uint32_t* makeDict(uint32_t * wVecs, int dict_count, uint32_t key, bool show=fal
     }
 
 
-    uint32_t VOCAB = 393495; //letters: abceirs
-    VOCAB = 7; //ab_____
-    VOCAB = key;
-
 
     int lWord = 0;
-    int sz = 0;
-    int i = 0;
+    int i = 0;      //declaring flag variables outside of scope can lead to fewer memory allocations
     int j = 0;
 
     uint32_t wVec = 0; //local vector. the vector for a single word.
