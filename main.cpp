@@ -1,12 +1,13 @@
 #include <iostream>
 #include <fstream>
-#include <regex>
+//#include <regex>
 
 #include <tgmath.h>
 #include "genetics.h"
 
 
 #include <cstdlib>
+
 
 using namespace std;
 
@@ -47,7 +48,6 @@ uint32_t* makeDict(uint32_t * wVecs, int dict_count, uint32_t key, bool show=fal
     }
 
 
-
     int lWord = 0;
     int i = 0;      //declaring flag variables outside of scope can lead to fewer memory allocations
     int j = 0;
@@ -59,13 +59,13 @@ uint32_t* makeDict(uint32_t * wVecs, int dict_count, uint32_t key, bool show=fal
 
 
     //std::regex pattern(R"(^[a-zA-Z]+,\".*)");
-    std::regex pattern(R"(.*)");
+    //std::regex pattern(R"(.*)");
 
     while (getline(fio, s) && i < dict_count) {
 
         //std::cout << "Enter a line: ";
         
-        if (std::regex_match(s, pattern)) {
+        if (true/*std::regex_match(s, pattern)*/) {
             // while loop to generate an N-hot vector representing given line.
                 //Format note: the place value is shifted one to the right, so ""...00000010" is "a". 
                 //the least significant bit is often set to 1. Some bitwise arithmetic is easier if we have a spare space.
@@ -494,6 +494,6 @@ int main() {
     free(next_c);
     free(buffer);
     free(c_buffer);
-
+    system("pause");
     return 0;
 }
