@@ -419,7 +419,7 @@ int main() {
     int gens = 35; //number of generations to go  through
     for(int i=0; i<gens; i++){
         std::cout << std::endl; //newline 
-
+        std::cout << "generation #" << i << std::endl;
         int threshold = calc_fitness(dict, vocabs, centers, scores, test_count, dict_count, 100);
         threshold = threshold * 1.05;
         //next_v and next_c are now loaded.
