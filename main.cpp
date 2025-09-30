@@ -397,7 +397,7 @@ int main() {
 
         //create a new temporary array of each datatype
         uint32_t *dict_T = (uint32_t *) malloc(dict_count * sizeof(uint32_t));
-        //assign to vocabs
+        //assign to dictionary locations
         for(int i=0;i<arrsz; i++){
             int location = idxs[i];
             dict_T[i] = dict[location];
@@ -405,13 +405,12 @@ int main() {
 
         
         ////cleanup the backup arrays
-        //swap the addresses using a quick-and-dirty method
+        //swap the addresses using a quick method
         uint32_t *temp = 0;
         temp = dict_T;
         dict_T = dict;
         dict = temp; 
 
-        std::cout <<"frick!" << std::endl;
 
         //free the unused array
         free(dict_T);
@@ -452,55 +451,62 @@ int main() {
 
     // GENETIC LOOP
 
-    int gens = 15; //number of generations to go  through
+    int gens = 35; //number of generations to go  through
     for(int i=0; i<gens; i++){
         std::cout << std::endl; //newline 
         std::cout << "generation #" << i << std::endl;
-        int threshold = calc_fitness(dict, vocabs, centers, scores, test_count, dict_count, 100);
-        threshold = threshold * 1.05;
-        //next_v and next_c are now loaded.
-        //std::cout << "first 5:" << vocabs[1] << " "<< vocabs[2]<< " " << vocabs[3]<< " " << vocabs[4]<< " " << vocabs[5] << std::endl;
 
+        //To speed up assessment, we need to select a subset of the random dictionary.
+            //we will select a start word and a number of tests words.
+            //we should  always have the same number of test words in a generation.
+            //we cannot go beyond the end of the array. As a side effect, the earliest and last test words will be less likely. 
+        float DictPct = 0.05; //percentage of the dictionary to test at any time.
+        const int testDictSize = int(dict_count * DictPct);
+        int startIndex = rand() % (dict_count - int((dict_count/100) * DictPct) );
+
+
+        //Determine fitness
+        int threshold = calc_fitness(dict, vocabs, centers, scores, test_count, testDictSize, 2);
+        threshold = threshold * 1.05;
+        
+        //show some debug, get top performer for stats
         int bestIndex = generation_info(scores,  test_count);
+        //catch number of survivors. Populate the next arrays with survivors. 
+        //Note number of survivors is important. may see use as start index for mutating samples.
         int survivors = fit_samples(vocabs, centers, scores, test_count, threshold, next_v, next_c, scores2, test_count);
 
         uint32_t bestKeyA = vocabs[bestIndex];
         uint32_t bestKeyB = next_v[bestIndex];
 
-
-        // debug print statements
-        
-        //show highest score
-        key_to_string( buffer, vocabs[bestIndex]);
-        uint32_t test = centers[bestIndex];
-        std::cout << "Best Puzzle: " << buffer << "   C="<< centers[bestIndex] <<" with "<< scores[bestIndex] <<  std::endl; //double endl for space
-       
-        // Debug Statements
-        //std::cout << "as " << vocabs[bestIndex] << std::endl;
-        //key_to_string( buffer, next_v[bestIndex]);
-        //std::cout << "             " << buffer << " is the best here" << std::endl;
-        //std::cout << "Best Puzzle: [" << buffer << "] C="<< /*next_c[bestIndex] <<*/" with "<< scores[bestIndex] <<  std::endl << std::endl; //double endl for space
-        //std::cout << "as " << vocabs[bestIndex] << std::endl << std::endl;
-        //std::cout << vocabs[bestIndex] << " At index " << bestIndex << std::endl;
-        //compare_key_arrs(vocabs, next_v, test_count);
+        // Working with the Data
+                    //show highest score
+                    key_to_string( buffer, vocabs[bestIndex]);
+                    uint32_t test = centers[bestIndex];
+                    std::cout << "Best Puzzle: " << buffer << "   C="<< centers[bestIndex] <<" with "<< scores[bestIndex] <<  std::endl; //double endl for space
+                
+                    // Debug Statements
+                    //std::cout << "as " << vocabs[bestIndex] << std::endl;
+                    //key_to_string( buffer, next_v[bestIndex]);
+                    //std::cout << "             " << buffer << " is the best here" << std::endl;
+                    //std::cout << "Best Puzzle: [" << buffer << "] C="<< /*next_c[bestIndex] <<*/" with "<< scores[bestIndex] <<  std::endl << std::endl; //double endl for space
+                    //std::cout << "as " << vocabs[bestIndex] << std::endl << std::endl;
+                    //std::cout << vocabs[bestIndex] << " At index " << bestIndex << std::endl;
+                    //compare_key_arrs(vocabs, next_v, test_count);
 
 
-        //organize data to export
-        data[0] = i;
-        data[1] = threshold; //average score without runts
-        data[2] = survivors;
-        data[4] = scores[bestIndex];
-
-        //export data
-        for(int d=0; d<5; d++){
-            //std::cout << data[d] << ", "; //debug, readline as seen in csv file.
-            outfile   << data[d] << ", ";
-        }
-
-        char cChar = char(std::log(next_c[bestIndex] >> 1)+96); //extremely simple 1hot to character
-
-        outfile   << buffer << ','; //write highest scoring vocab to the summary
-        outfile   << std::endl;
+                    //organize data to export
+                    data[0] = i;
+                    data[1] = threshold; //average score without runts
+                    data[2] = survivors;
+                    data[4] = scores[bestIndex];
+                    //export data
+                    for(int d=0; d<5; d++){
+                        //std::cout << data[d] << ", "; //debug, readline as seen in csv file.
+                        outfile   << data[d] << ", ";
+                    }
+                    char cChar = char(std::log(next_c[bestIndex] >> 1)+96); //extremely simple 1hot to character
+                    outfile   << buffer << ','; //write highest scoring vocab to the summary
+                    outfile   << std::endl;
 
 
         //generation complete. Prepare next generation 
