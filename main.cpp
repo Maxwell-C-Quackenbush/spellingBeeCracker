@@ -2,7 +2,8 @@
 #include <fstream>
 //#include <regex>
 #include <algorithm>
-
+#include <array>
+#include <random> 
 #include <tgmath.h>
 #include "genetics.h"
 
@@ -368,7 +369,7 @@ int main() {
 
 
     //generate dictionary
-    int dict_count = 370099; //from the file. hardcoded temporarily.
+    const int dict_count = 370099; //from the file. hardcoded temporarily.
     uint32_t *dict = (uint32_t *) malloc( dict_count * sizeof(uint32_t));
     makeDict(dict, dict_count, vocabs[0]);
 
@@ -377,14 +378,45 @@ int main() {
         //this is useful because it will allow us to easily take RANDOM samples of our dictionary for use in 
     
     //create a range of integer indexes to shuffle
-    int *idxs = (int*) malloc(dict_count*sizeof(int));
+    
+    const int arrsz = dict_count;
+    std:array<int,arrsz> idxs {};
 
-    // re-order the indexes randomly
+    for(int i =0; i<arrsz; i++){
+        idxs[i] = i;
+    }
+    
+    // re-order the indexes randomly    
+    std::shuffle(idxs.begin(), idxs.end(), std::default_random_engine() );
+
     //re-order the N-hot vectors according to the new order
+            /*for the shuffled idxs [2,4,0,3,1] and the array [10,20,30,40,50]
+            the array will become: [30, 50, 10, 40, 20]  
+            */
+
+
         //create a new temporary array of each datatype
+        uint32_t *dict_T = (uint32_t *) malloc(dict_count * sizeof(uint32_t));
         //assign to vocabs
-        //assign to centers
-        //cleanup the backup arrays
+        for(int i=0;i<arrsz; i++){
+            int location = idxs[i];
+            dict_T[i] = dict[location];
+        }
+
+        
+        ////cleanup the backup arrays
+        //swap the addresses using a quick-and-dirty method
+        uint32_t *temp = 0;
+        temp = dict_T;
+        dict_T = dict;
+        dict = temp; 
+
+        std::cout <<"frick!" << std::endl;
+
+        //free the unused array
+        free(dict_T);
+        
+
         //TODO: add functionality to re-order the literal words.
             //this may involve creating a second, complimentary IDXs table.
             
@@ -498,7 +530,6 @@ int main() {
     free(next_c);
     free(buffer);
     free(c_buffer);
-    free(idxs);
     system("pause");
     return 0;
 }
