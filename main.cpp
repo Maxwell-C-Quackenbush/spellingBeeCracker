@@ -387,34 +387,17 @@ int main() {
         //cleanup the backup arrays
         //TODO: add functionality to re-order the literal words.
             //this may involve creating a second, complimentary IDXs table.
-        
+            
 
 
-
-    // test generated keys
+    //create storage for keys' scores 
     int scores[test_count];
     int scores2[test_count]; //alternate array of scores
 
-
-
-
-
-
-
+    //buffer for printing strings
     char* buffer = (char*) (calloc(sizeof(char),10)); 
     char* c_buffer = (char*) (calloc(sizeof(char),10)); 
 
-
-
-
-
-
-    //check_dict_gpu()
-    //cudaMallocManaged(&dict, size*sizeof(uint32_t) );
-    //cudaFree(dict);
-
-
-    //
 
     ofstream outfile;
     outfile.open("summary.csv");
@@ -437,7 +420,7 @@ int main() {
 
     // GENETIC LOOP
 
-    int gens = 35; //number of generations to go  through
+    int gens = 15; //number of generations to go  through
     for(int i=0; i<gens; i++){
         std::cout << std::endl; //newline 
         std::cout << "generation #" << i << std::endl;
