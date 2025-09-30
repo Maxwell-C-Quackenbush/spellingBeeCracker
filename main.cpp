@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 //#include <regex>
+#include <algorithm>
 
 #include <tgmath.h>
 #include "genetics.h"
@@ -348,6 +349,7 @@ int generation_info(int* scores, int size ){
 }
 
 
+
 /* Save a generation to file. 
  * TODO: add planned feature
  */
@@ -370,9 +372,28 @@ int main() {
     uint32_t *dict = (uint32_t *) malloc( dict_count * sizeof(uint32_t));
     makeDict(dict, dict_count, vocabs[0]);
 
+
+    //now we are going to shuffle the dictionary
+        //this is useful because it will allow us to easily take RANDOM samples of our dictionary for use in 
+    
+    //create a range of integer indexes to shuffle
+    int *idxs = (int*) malloc(dict_count*sizeof(int));
+
+    // re-order the indexes randomly
+    //re-order the N-hot vectors according to the new order
+        //create a new temporary array of each datatype
+        //assign to vocabs
+        //assign to centers
+        //cleanup the backup arrays
+        //TODO: add functionality to re-order the literal words.
+            //this may involve creating a second, complimentary IDXs table.
+        
+
+
+
     // test generated keys
     int scores[test_count];
-    int scores2[test_count];
+    int scores2[test_count]; //alternate array of scores
 
 
 
@@ -494,6 +515,7 @@ int main() {
     free(next_c);
     free(buffer);
     free(c_buffer);
+    free(idxs);
     system("pause");
     return 0;
 }
