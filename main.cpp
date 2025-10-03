@@ -451,7 +451,7 @@ int main() {
 
     // GENETIC LOOP
 
-    int gens = 35; //number of generations to go  through
+    int gens = 50; //number of generations to go  through
     for(int i=0; i<gens; i++){
         std::cout << std::endl; //newline 
         std::cout << "generation #" << i << std::endl;
@@ -460,13 +460,13 @@ int main() {
             //we will select a start word and a number of tests words.
             //we should  always have the same number of test words in a generation.
             //we cannot go beyond the end of the array. As a side effect, the earliest and last test words will be less likely. 
-        float DictPct = 0.05; //percentage of the dictionary to test at any time.
-        const int testDictSize = int(dict_count * DictPct);
-        int startIndex = rand() % (dict_count - int((dict_count/100) * DictPct) );
+        float DictPrcnt = 0.05; //percentage of the dictionary to test at any time.
+        const int DictTrialSize = int(dict_count * DictPrcnt);
+        int startIndex = rand() % (dict_count - int((dict_count/100) * DictPrcnt) );
 
 
         //Determine fitness
-        int threshold = calc_fitness(dict, vocabs, centers, scores, test_count, testDictSize, 2);
+        int threshold = calc_fitness(&dict[startIndex], vocabs, centers, scores, test_count, DictTrialSize, 2);
         threshold = threshold * 1.05;
         
         //show some debug, get top performer for stats
@@ -482,7 +482,7 @@ int main() {
                     //show highest score
                     key_to_string( buffer, vocabs[bestIndex]);
                     uint32_t test = centers[bestIndex];
-                    std::cout << "Best Puzzle: " << buffer << "   C="<< centers[bestIndex] <<" with "<< scores[bestIndex] <<  std::endl; //double endl for space
+                    std::cout << "Best Puzzle: " << buffer << " C = "<< char(pow(centers[bestIndex], 0.5)+96) <<" with "<< scores[bestIndex] <<  std::endl; //double endl for space
                 
                     // Debug Statements
                     //std::cout << "as " << vocabs[bestIndex] << std::endl;
