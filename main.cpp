@@ -6,7 +6,8 @@
 #include <random> 
 #include <tgmath.h>
 #include "genetics.h"
-
+#include "generation.h"
+#include "constants.h"
 
 #include <cstdlib>
 
@@ -451,7 +452,7 @@ int main() {
 
     // GENETIC LOOP
 
-    int gens = 35; //number of generations to go  through
+    int gens = 100; //number of generations to go  through
     for(int i=0; i<gens; i++){
         std::cout << std::endl; //newline 
         std::cout << "generation #" << i << std::endl;
@@ -484,6 +485,8 @@ int main() {
                     uint32_t test = centers[bestIndex];
                     std::cout << "Best Puzzle: " << buffer << "   C="<< centers[bestIndex] <<" with "<< scores[bestIndex] <<  std::endl; //double endl for space
                 
+
+
                     // Debug Statements
                     //std::cout << "as " << vocabs[bestIndex] << std::endl;
                     //key_to_string( buffer, next_v[bestIndex]);
