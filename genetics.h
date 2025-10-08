@@ -135,7 +135,7 @@ int test_key_charcount(uint32_t * keyOriginal){
 }
 
 
-int check_dict_cpu(uint32_t * wVecs, int count, uint32_t key, uint32_t center_letter ){
+int check_dict_cpu(uint32_t * wVecs, int count, uint32_t key, uint32_t centerLetter ){
     //std::cout << "checking key: " << key << std::endl;
     //declare variables outside of loop for added speed
     int foundCount = 0; //value returned
@@ -157,7 +157,7 @@ int check_dict_cpu(uint32_t * wVecs, int count, uint32_t key, uint32_t center_le
                                     
         //see if center_letter is in local_word
         //should be zero if there are no bits that line up.
-        hasCenter = center_letter & localWord;
+        hasCenter = centerLetter & localWord;
         // has_center will be non-zero if the local word contains the Center letter.
             // this is true because the binary AND operation, when used on a one-hot vector, can only return the OHV or 0.
             // these outputs are determined by the value of the local word at the "center index" (index of the center letter)
@@ -242,29 +242,29 @@ Fills the provided buffer with all valid samples.
 returns the number of survivors that "passed" / "Lived" from prior generation
 */
 int fit_samples(
-            uint32_t* vocabs_in,    //size: size_in
-            uint32_t* centers_in,   //size: size_in
+            uint32_t* inVocabs,    //size: size_in
+            uint32_t* inCenters,   //size: size_in
             int* scores,            //size: size_in
-            uint32_t size_in,       
+            uint32_t inSize,       
 
             //minimum value. sometimes average, sometimes skewed.
             int cutoff,
             
             //output buffers
-            uint32_t* vocabs_out,
-            uint32_t* centers_out,
-            int* scores_out,
-            uint32_t size_out       
+            uint32_t* outVocabs,
+            uint32_t* outCenters,
+            int* outScores,
+            uint32_t outSize       
 ){
     
     int ptNGen = 0; //pointer in next, actually an index.
     int margin;
     
-    for(int i=0; i<size_in; i++){
+    for(int i=0; i<inSize; i++){
         margin = cutoff - scores[i];
         if (margin < 0){
-            vocabs_out[ptNGen]  = vocabs_in[i];
-            centers_out[ptNGen] = centers_in[i];
+            outVocabs[ptNGen]  = inVocabs[i];
+            outCenters[ptNGen] = inCenters[i];
             //scores_out[ptNGen]  = scores[i];
             ptNGen++;
         }
@@ -298,11 +298,11 @@ int mutate_samples_n(
     uint32_t* Cvocabs,
     uint32_t* Ccenters
 ){
-    int ptr_parent = 0;
-    int ptr_child = lastParent;
+    int ptrParent = 0;
+    int ptrChild = lastParent;
     
-    uint32_t * child_vocab; //placeholder for a given child vocab
-    uint32_t * child_center; //placeholder for a given child center
+    uint32_t * childVocab; //placeholder for a given child vocab
+    uint32_t * childCenter; //placeholder for a given child center
     
     int numTooMany = 0;
 
@@ -312,26 +312,26 @@ int mutate_samples_n(
             numTooMany = numTooMany;
         }
         //pass memory adresses as arguments
-        child_vocab = &Cvocabs[i];
-        child_center = &Ccenters[i];
+        childVocab = &Cvocabs[i];
+        childCenter = &Ccenters[i];
 
         mutate_one(
-            Pvocabs[ptr_parent],
-            Pcenters[ptr_parent],
-            child_vocab,
-            child_center
+            Pvocabs[ptrParent],
+            Pcenters[ptrParent],
+            childVocab,
+            childCenter
         );
         //Cvocabs[i] = child_vocab;
         //Ccenters[i] = child_center;
 
         // DEBUG: during development, the number of selected letters could exceeed 7.
-        numTooMany += test_key_charcount(child_vocab);
-        ptr_parent++;
-        ptr_child++;
+        numTooMany += test_key_charcount(childVocab);
+        ptrParent++;
+        ptrChild++;
 
         //we do not want to take copies from the children. 
-        if (ptr_parent > lastParent){   //if we are at the end of the parent section,
-            ptr_parent=0;                //restart at beginning.
+        if (ptrParent > lastParent){   //if we are at the end of the parent section,
+            ptrParent=0;                //restart at beginning.
         }
 
     }

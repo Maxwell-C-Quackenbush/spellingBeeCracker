@@ -138,15 +138,15 @@ uint32_t makeKey(string s){
     uint32_t i = 0;
     uint32_t lim = uint32_t(s.length()-1); //size of string / limit
     uint32_t flag = 0;
-    uint32_t this_letter = 0;
+    uint32_t thisLetter = 0;
 
     for(i = 0; i<lim; i++ ) {
         //index -96, brings us from start of lowercase ASCII letters to 0. 
         uint32_t temp = uint32_t(s[i]-96);
 
-        this_letter = 1;
-        this_letter = this_letter << temp;
-        flag = flag | this_letter;
+        thisLetter = 1;
+        thisLetter = thisLetter << temp;
+        flag = flag | thisLetter;
     }
     return flag;
 
@@ -164,14 +164,14 @@ uint32_t makeKey(string s){
  * */
 char* key_to_string(char* buffer, uint32_t key){
     uint32_t k = key; //copy for cleanliness, we will be altering the value
-    int letters_found = 0; //position
+    int lettersFound = 0; //position
 
     //uint32_t lint = 1;
     for(int i=0; i<26;i++){
       if ( (k % 2) != 0 ) { //is the trailing value 1?
         //then this letter is in the string!
-        buffer[letters_found] = char(96+i);
-        letters_found++;
+        buffer[lettersFound] = char(96+i);
+        lettersFound++;
       }
 
       k = k >> 1; //slide... to the right! 
@@ -359,19 +359,19 @@ int savegeneration(uint32_t vocabs, uint32_t centers, int size, int * scores, ch
 }
 
 int main() {
-    int test_count = 2000;
+    int testCount = 2000;
 
-    uint32_t *vocabs = (uint32_t *) malloc(test_count * sizeof(uint32_t));
-    uint32_t *centers = (uint32_t *) malloc(test_count * sizeof(uint32_t));
+    uint32_t *vocabs = (uint32_t *) malloc(testCount * sizeof(uint32_t));
+    uint32_t *centers = (uint32_t *) malloc(testCount * sizeof(uint32_t));
 
     //generate keys for first generation
-    generate_keys(vocabs, centers, test_count);
+    generate_keys(vocabs, centers, testCount);
 
 
     //generate dictionary
-    const int dict_count = 370099; //from the file. hardcoded temporarily.
-    uint32_t *dict = (uint32_t *) malloc( dict_count * sizeof(uint32_t));
-    makeDict(dict, dict_count, vocabs[0]);
+    const int dictCount = 370099; //from the file. hardcoded temporarily.
+    uint32_t *dict = (uint32_t *) malloc( dictCount * sizeof(uint32_t));
+    makeDict(dict, dictCount, vocabs[0]);
 
 
     //now we are going to shuffle the dictionary
@@ -379,7 +379,7 @@ int main() {
     
     //create a range of integer indexes to shuffle
     
-    const int arrsz = dict_count;
+    const int arrsz = dictCount;
     std:array<int,arrsz> idxs {};
 
     for(int i =0; i<arrsz; i++){
@@ -396,24 +396,24 @@ int main() {
 
 
         //create a new temporary array of each datatype
-        uint32_t *dict_T = (uint32_t *) malloc(dict_count * sizeof(uint32_t));
+        uint32_t *dictTemp = (uint32_t *) malloc(dictCount * sizeof(uint32_t));
         //assign to dictionary locations
         for(int i=0;i<arrsz; i++){
             int location = idxs[i];
-            dict_T[i] = dict[location];
+            dictTemp[i] = dict[location];
         }
 
         
         ////cleanup the backup arrays
         //swap the addresses using a quick method
         uint32_t *temp = 0;
-        temp = dict_T;
-        dict_T = dict;
+        temp = dictTemp;
+        dictTemp = dict;
         dict = temp; 
 
 
         //free the unused array
-        free(dict_T);
+        free(dictTemp);
         
 
         //TODO: add functionality to re-order the literal words.
@@ -422,12 +422,12 @@ int main() {
 
 
     //create storage for keys' scores 
-    int scores[test_count];
-    int scores2[test_count]; //alternate array of scores
+    int scores[testCount];
+    int scores2[testCount]; //alternate array of scores
 
     //buffer for printing strings
     char* buffer = (char*) (calloc(sizeof(char),10)); 
-    char* c_buffer = (char*) (calloc(sizeof(char),10)); 
+    char* bufferCenter = (char*) (calloc(sizeof(char),10)); 
 
 
     ofstream outfile;
@@ -435,13 +435,13 @@ int main() {
     int data[] = {0,0,0,0,0};
     //data = [i, avg, runts, survivors, bestScore]
 
-    uint32_t best_key = 1859618;
-    uint32_t best_center = 2;
+    uint32_t bestKey = 1859618;
+    uint32_t bestCenter = 2;
 
     //uint32_t *next_v = (uint32_t *) malloc(test_count * sizeof(uint32_t));
     //uint32_t *next_c = (uint32_t *) malloc(test_count * sizeof(uint32_t));
-    uint32_t *next_v = (uint32_t *) calloc(sizeof(uint32_t), test_count);
-    uint32_t *next_c = (uint32_t *) calloc(sizeof(uint32_t), test_count);
+    uint32_t *nextV = (uint32_t *) calloc(sizeof(uint32_t), testCount);
+    uint32_t *nextC = (uint32_t *) calloc(sizeof(uint32_t), testCount);
     uint32_t *holder;
     
     // DEBUG: test the encoding of the keys. Should be  aemnrst
@@ -461,22 +461,22 @@ int main() {
             //we should  always have the same number of test words in a generation.
             //we cannot go beyond the end of the array. As a side effect, the earliest and last test words will be less likely. 
         float DictPrcnt = 0.05; //percentage of the dictionary to test at any time.
-        const int DictTrialSize = int(dict_count * DictPrcnt);
-        int startIndex = rand() % (dict_count - int((dict_count/100) * DictPrcnt) );
+        const int DictTrialSize = int(dictCount * DictPrcnt);
+        int startIndex = rand() % (dictCount - int((dictCount/100) * DictPrcnt) );
 
 
         //Determine fitness
-        int threshold = calc_fitness(&dict[startIndex], vocabs, centers, scores, test_count, DictTrialSize, 2);
+        int threshold = calc_fitness(&dict[startIndex], vocabs, centers, scores, testCount, DictTrialSize, 2);
         threshold = threshold * 1.05;
         
         //show some debug, get top performer for stats
-        int bestIndex = generation_info(scores,  test_count);
+        int bestIndex = generation_info(scores,  testCount);
         //catch number of survivors. Populate the next arrays with survivors. 
         //Note number of survivors is important. may see use as start index for mutating samples.
-        int survivors = fit_samples(vocabs, centers, scores, test_count, threshold, next_v, next_c, scores2, test_count);
+        int survivors = fit_samples(vocabs, centers, scores, testCount, threshold, nextV, nextC, scores2, testCount);
 
         uint32_t bestKeyA = vocabs[bestIndex];
-        uint32_t bestKeyB = next_v[bestIndex];
+        uint32_t bestKeyB = nextV[bestIndex];
 
         // Working with the Data
                     //show highest score
@@ -504,23 +504,23 @@ int main() {
                         //std::cout << data[d] << ", "; //debug, readline as seen in csv file.
                         outfile   << data[d] << ", ";
                     }
-                    char cChar = char(std::log(next_c[bestIndex] >> 1)+96); //extremely simple 1hot to character
+                    char cChar = char(std::log(nextC[bestIndex] >> 1)+96); //extremely simple 1hot to character
                     outfile   << buffer << ','; //write highest scoring vocab to the summary
                     outfile   << std::endl;
 
 
         //generation complete. Prepare next generation 
-        mutate_samples_n(vocabs, centers, test_count, threshold, vocabs, centers );
+        mutate_samples_n(vocabs, centers, testCount, threshold, vocabs, centers );
 
 
         //now we will switch the labels on the arrays.
         //this is done to save memory.
-        holder = next_v;
-        next_v = vocabs;
+        holder = nextV;
+        nextV = vocabs;
         vocabs = holder;
 
-        holder  = next_c;
-        next_c  = centers;
+        holder  = nextC;
+        nextC  = centers;
         centers = holder;
     }
     outfile.close();
@@ -532,10 +532,10 @@ int main() {
     free(dict);
     free(vocabs);
     free(centers);
-    free(next_v);
-    free(next_c);
+    free(nextV);
+    free(nextC);
     free(buffer);
-    free(c_buffer);
+    free(bufferCenter);
     system("pause");
     return 0;
 }
