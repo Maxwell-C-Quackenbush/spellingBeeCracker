@@ -38,7 +38,68 @@ Rather than represent these structures as arrays of boolean values, I realised t
 
 4. If the result is False, we know that there are no letters outside the given vocabulary.
 
+#### Encoding Example
+
+here is an example of how the word "aerie" would be encoded.
+| Abstract | index meaning |
+| --------- | ------------|
+| place value|`/////zyxwvutsrqponmlkjihgfedcba_`
+|  Binary representation| `00000000000001000100000000100011`
+|  Highlighted characters| **`/////--------r--------i---e---a_`**
+
+
+As the word "Aerie" has two instances of the letter E, we only need to note the presence of the letter.
+
+
+
+The below indicates the value of various 32-bit encodings during execution
+
 | Abstract | Binary Representation |
 | --------- | ------------|
-| local_word[aerie] << 1 +1 | 000 |
-| Key(aemnrst) as 1859618
+| local_word = **{aerie}** << 1 +1 | `00000000000001000100000000100011` |
+| Key = **{aeinrst}** as 1859618 | `00000000000111000100001000100010` |
+| ~local_word | `11111111111110111011111111011100` | 
+| Key \| local_word | `11111111111111111111111111111110` |
+| ~(Key \| local_word) | `00000000000000000000000000000001`
+
+After bitwise processing, the value evaluates to one as an integer. Any value other than one can be used to identify a failure.
+
+## Genetic Algorithm Implimentation
+
+Operation is defined by a specified generation size and generation count. After each generation, the most fit are saved, and the least fit are discarded. Fitness is a function of the number of scoring words. The cutoff is based on the average score of all puzzles above a hyperparameter threshold. 
+
+Surviving puzzles take turns creating a “mutant” offspring where one random selected letter and an unselected letter have their statuses swapped while preserving the 7-letter limit. Although this  procedure is simple and efficient, it also is limited insofar that center letters cannot be changed.
+
+Both sample sizes converged to the same local maxima of [aeinrst] with an invalid center. The large final jump in performance is due to the winner overtaking the same subset with a center letter of E. There is no mechanism for center letter mutations. This means that an entirely separate lineage ended up scoring the best!
+
+Of course, the center letter must not be a zero vector. This behaviour was due to a (now fixed) bug where there was a small chance of a zeroed center vector at creation. I think this is a fascinating example of evolution developing unexpected traits, so I decided to include it in my analysis.
+ 
+
+| Vocabulary | Center | Score | First Generation |
+| ---- | ---- | ---- | ---- |
+| aeinrst | e | 1719   | 10th 
+| aeinrst | null | 2595 | 16th |
+
+### Generations until local maxima
+
+| N= | Generation | Dictionary Count | Relative Efficiency |
+| --- | --- | --- | --- |
+| 1000 | 42 | 42 000 | 0.76 |
+| 2000 | 16 | 32 000 | 1.0 |
+| 5000 | 18 | 90 000 | 0.35 |
+
+The baseline N=2000 had to perform 32 000 iterations through the dictionary to find the local maximum. When doing a single trial of 32,000 without a genetic algorithm, our maximum score is 1195 ( [einrstu], center =[E]) With the same number of dictionary iterations, we have a 117% improvement over the brute force method for an NP-hard problem. 
+
+### Emergent Behaviour
+
+There is a non-convergent feedback loop when using the average to cull a generation because of the nature of the heuristic. Single-codon changes can result in a near-total loss of performance, resulting in many “runts”. 
+
+With an introductory sample and runt pruning, we only save 40 out of 2000 samples! This is a huge loss in genetic diversity. In the subsequent generation, the space left by the poor performers is filled by the offspring of decent puzzles.
+
+We oscillate between a higher threshold generation with more survivors and a lower threshold generation with fewer survivors. Put another way, we may refer to these as G1 and G2.
+
+G2’s gene pool is larger, and there are fewer chances for “runts” to materialize. This raises the expected average score, and creates a G2 generation. The G1 generation’s progeny has a large cull; many models are discarded as the average is higher. This means that there is a subsequent smaller gene pool, and creates a G2 generation.
+
+### Summary
+
+The puzzle with the most answers is highly dependent on the input dictionary, but the longest I have found so far is “Aemnrst” (center letter A), with 1324 solutions. “Fhjkqxy” (Center letter F) is in last place, with 4 answers. I suspect F is the proper center letter and not X, because the inclusion of X would validate some roman numerals included in the dictionary without filtration. 
