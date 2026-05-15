@@ -17,7 +17,7 @@ I am a fan of New York Times puzzles and wordgames, and for a time enjoyed doing
 ### Calculating problem space
 Each spelling bee puzzle consists of 7 letters, with one designated as a center letter. The center letter must be included in each word. Letters can be used more than once. We can represent all puzzles with the formula:
 
-$x= \frac{26!}{ 19! (26-19)!} 7$
+$x= \frac{26!}{ 19! (26-19)!}  * 7$
 
 $x=4,604,600$
 
@@ -50,8 +50,8 @@ here is an example of how the word "aerie" would be encoded.
 | Abstract | index meaning |
 | --------- | ------------|
 | place value|`/////zyxwvutsrqponmlkjihgfedcba_`
-|  Binary representation| `00000000000001000100000000100011`
-|  Highlighted characters| **`/////--------r--------i---e---a_`**
+|  Binary representation|    `00000000000001000000001000100011`
+|  Highlighted characters| **`/////--------r--------i---e---a/`**
 
 
 As the word "Aerie" has two instances of the letter E, we only need to note the presence of the letter.
@@ -77,6 +77,8 @@ After bitwise processing, the value evaluates to one as an integer. Any value ot
 
 Operation is defined by a specified generation size and generation count. After each generation, the most fit are saved, and the least fit are discarded. Fitness is a function of the number of scoring words. The cutoff is based on the average score of all puzzles above a hyperparameter threshold. 
 
+Later revisoins have added an optimization where a subset of the total dictionary is selected for each generation. The subset is pseudo-random, and 5% is selected each round by selecting a random starting index from a constant randomized dictionary. For small language dictionaries this method may not be appropriate.
+
 Surviving puzzles take turns creating a “mutant” offspring where one random selected letter and an unselected letter have their statuses swapped while preserving the 7-letter limit. Although this  procedure is simple and efficient, it also is limited insofar that center letters cannot be changed.
 
 Both sample sizes converged to the same local maxima of [aeinrst] with an invalid center. The large final jump in performance is due to the winner overtaking the same subset with a center letter of E. There is no mechanism for center letter mutations. This means that an entirely separate lineage ended up scoring the best!
@@ -98,6 +100,7 @@ Of course, the center letter must not be a zero vector. This behaviour was due t
 | 5000 | 18 | 90 000 | 0.35 |
 
 The baseline N=2000 had to perform 32 000 iterations through the dictionary to find the local maximum. When doing a single trial of 32,000 without a genetic algorithm, our maximum score is 1195 ( [einrstu], center =[E]) With the same number of dictionary iterations, we have a 117% improvement over the brute force method for an NP-hard problem. 
+
 
 ### Emergent Behaviour
 

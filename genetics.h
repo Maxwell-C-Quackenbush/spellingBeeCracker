@@ -47,45 +47,20 @@ int mutate_one(uint32_t key, uint32_t cent, uint32_t * childV, uint32_t * childC
             case 1: // Character is Present in our vector
                 oldChar--; //seen one additional old character
                 //if we have seen the proper number of prior characters, Old char will be zero.
-
                 // a faster way of comprehension:
                 newOneHot = bool(oldChar == 0) << i; //when on the proper character, bool evals to 0. all other cases 1.
                 key = key - newOneHot;              //remove the component of the vector by subtraction.
-
-                /** Prior code; slower than boolean casting in some compilers and CPUs.
-                    Kept for reader clarity/
-
-                if (oldChar == 0 && false){
-                    //we have found the character that we are looking for!
-                    newOneHot = 1 << i;    //creante N-hot for mutation
-                    key = key - newOneHot;          //set to 0
-                }*/
                 break;
 
             case 0:
                 newChar--; //seen one additional non-present character
                 //if we have seen the proper number of prior characters..
-
                 newOneHot = bool(newChar == 0) << i; //when on the proper character, bool evals to 0. all other cases 1.
                 key = key + newOneHot;              //remove the component of the vector by subtraction.
-
-                /*
-                Prior code; slower than boolean casting in some compilers and CPUs.
-                    Kept for reader clarity
-             
-                if(newChar == 0){   
-                    //we have found the character we are looking for!
-                    newOneHot = 1 << i;    // create N-hot for mutation
-                    key = key + newOneHot;          // set to ONE by adding.
-                }
-                    */
                 break;
-
-
         default:
             k; //do nothing
         }
-
         //we have processed the final character for the next gnearation.
         k = k >> 1; //shift for next iteration
         if (oldChar <= 0 && newChar <= 0){
@@ -136,7 +111,6 @@ int test_key_charcount(uint32_t * keyOriginal){
 
 
 int check_dict_cpu(uint32_t * wVecs, int count, uint32_t key, uint32_t centerLetter ){
-    //std::cout << "checking key: " << key << std::endl;
     //declare variables outside of loop for added speed
     int foundCount = 0; //value returned
     uint32_t localWord;
@@ -163,16 +137,6 @@ int check_dict_cpu(uint32_t * wVecs, int count, uint32_t key, uint32_t centerLet
             // these outputs are determined by the value of the local word at the "center index" (index of the center letter)
         
         foundCount += int(isValid==1 && hasCenter);
-
-        /* //branch conditions slow down this loop greatly. 
-        if((isValid==0 && hasCenter)) {
-                foundCount ++;
-        }*/
-
-        //the above code was replaced in part with an elegant cast of a boolean to an integer.
-        
-        
-
         i++;
     }
     return foundCount;
@@ -238,15 +202,13 @@ int calc_fitness(uint32_t* dict, uint32_t* vocabs, uint32_t* centers, int* score
 }
 /* 
 recieves a set of samples and a threshold.
-
 Fills the provided buffer with all valid samples.
-
 returns the number of survivors that "passed" / "Lived" from prior generation
 */
 int fit_samples(
-            uint32_t* inVocabs,    //size: size_in
-            uint32_t* inCenters,   //size: size_in
-            int* scores,            //size: size_in
+            uint32_t* inVocabs,    //size: inSize
+            uint32_t* inCenters,   //size: inSize
+            int* scores,            //size: inSize
             uint32_t inSize,       
 
             //minimum value. sometimes average, sometimes skewed.
@@ -309,10 +271,6 @@ int mutate_samples_n(
     int numTooMany = 0;
 
     for(int i=lastParent; i<size; i++){
-        
-        if(i==440){
-            numTooMany = numTooMany;
-        }
         //pass memory adresses as arguments
         childVocab = &Cvocabs[i];
         childCenter = &Ccenters[i];
@@ -323,8 +281,7 @@ int mutate_samples_n(
             childVocab,
             childCenter
         );
-        //Cvocabs[i] = child_vocab;
-        //Ccenters[i] = child_center;
+
 
         // DEBUG: during development, the number of selected letters could exceeed 7.
         numTooMany += test_key_charcount(childVocab);
