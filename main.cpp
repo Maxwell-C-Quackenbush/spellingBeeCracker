@@ -6,7 +6,7 @@
 #include <random> 
 #include <tgmath.h>
 #include "genetics.h"
-
+#include <print>
 
 #include <cstdlib>
 
@@ -120,7 +120,8 @@ uint32_t* makeDict(uint32_t * wVecs, int dict_count, uint32_t key, bool show=fal
         i++;
     }//end while loop iterating through file
 
-    std::cout << "Completed reading dictionary file." << std::endl;
+    //std::cout << "Completed reading dictionary file." << std::endl;
+    printf("Completed reading dictionary file. \n");
 
 
     fio.close();
@@ -197,8 +198,11 @@ char* key_to_string(char* buffer, uint32_t key){
  * at the end, duplicate letters are preserved.
  *
  * */
+
+
 int generate_keys(uint32_t vocabs[], uint32_t centers[], int count){
-    std::cout << "Generating Keys...   [" << count << "]" << std::endl;
+    //cout << "Generating Keys...   [" << endl;
+    printf("generating keys... [%d] \n", count);
     //uint32_t * vocabs = (uint32_t*) malloc ( count * sizeof(uint32_t) ) ;
     //uint32_t * centers = (uint32_t*) malloc ( count * sizeof(uint32_t) ) ;
     int rd = 0;
@@ -364,6 +368,10 @@ int main() {
     uint32_t *vocabs = (uint32_t *) malloc(testCount * sizeof(uint32_t));
     uint32_t *centers = (uint32_t *) malloc(testCount * sizeof(uint32_t));
 
+    //cout << "Test starts";
+    printf("Test Starts");
+    
+
     //generate keys for first generation
     generate_keys(vocabs, centers, testCount);
 
@@ -453,8 +461,9 @@ int main() {
 
     int gens = 50; //number of generations to go  through
     for(int i=0; i<gens; i++){
-        std::cout << std::endl; //newline 
-        std::cout << "generation #" << i << std::endl;
+        
+        printf("\n");                   //std::cout << std::endl; //newline 
+        printf("generation #%d\n", i);    //std::cout << "generation #" << i << std::endl;
 
         //To speed up assessment, we need to select a subset of the random dictionary.
             //we will select a start word and a number of tests words.
@@ -482,8 +491,9 @@ int main() {
                     //show highest score
                     key_to_string( buffer, vocabs[bestIndex]);
                     uint32_t test = centers[bestIndex];
-                    std::cout << "Best Puzzle: " << buffer << " C = "<< char(pow(centers[bestIndex], 0.5)+96) <<" with "<< scores[bestIndex] <<  std::endl; //double endl for space
-                
+                    //std::cout << "Best Puzzle: " << buffer << " C = "<< char(pow(centers[bestIndex], 0.5)+96) <<" with "<< scores[bestIndex] <<  std::endl; //double endl for space
+                    printf("    Best Puzzle: %s C=%c with %6d points", buffer, char(pow(centers[bestIndex], 0.5)+96), scores[bestIndex] );
+
                     // Debug Statements
                     //std::cout << "as " << vocabs[bestIndex] << std::endl;
                     //key_to_string( buffer, next_v[bestIndex]);

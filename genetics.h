@@ -227,8 +227,10 @@ int calc_fitness(uint32_t* dict, uint32_t* vocabs, uint32_t* centers, int* score
             numSurviving ++;
         }
     }
-    std::cout << "number of survivors: " << numSurviving << " out of " << size << std::endl; 
-    std::cout << "Runt count:" << runts << std::endl;
+    //std::cout << "number of survivors: " << numSurviving << " out of " << size << std::endl; 
+    printf("    number of survivors: %d out of %d\n", numSurviving, size);
+    //std::cout << "Runt count:" << runts << std::endl;
+    printf("    Runt Count: %d \n", runts);
 
     
 
