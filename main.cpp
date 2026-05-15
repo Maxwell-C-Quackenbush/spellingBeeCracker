@@ -1,3 +1,6 @@
+
+using namespace std;
+
 #include <iostream>
 #include <fstream>
 //#include <regex>
@@ -7,11 +10,11 @@
 #include <tgmath.h>
 #include "genetics.h"
 #include <print>
+#include <format>
 
 #include <cstdlib>
 
 
-using namespace std;
 
 
 
@@ -358,9 +361,33 @@ int generation_info(int* scores, int size ){
 /* Save a generation to file. 
  * TODO: add planned feature
  */
-int savegeneration(uint32_t vocabs, uint32_t centers, int size, int * scores, char* filename){
+int saveGeneration(uint32_t * vocabs, uint32_t * centers, int size, int * scores, string filename){
+    ofstream outfile(filename);
+    if (!outfile.is_open()) {
+        cerr << "Failed to open file for writing.\n";
+        return 1;
+    }
+
+    char buffer[30];
+               
+
+    outfile << "vocabs, center, score\n"; 
+    // Writing the array elements to the file
+    for (int i = 0; i < size; ++i) {
+        key_to_string( buffer, vocabs[i]);;
+        outfile << buffer  << ", ";
+        outfile << centers[i] << ", ";
+        outfile << scores[i] <<  ",\n";
+    }
+    // Closing the file
+    outfile.close();
+
     return 0;
 }
+
+
+
+
 
 int main() {
     int testCount = 2000;
@@ -459,7 +486,7 @@ int main() {
 
     // GENETIC LOOP
 
-    int gens = 50; //number of generations to go  through
+    int gens = 15; //number of generations to go  through
     for(int i=0; i<gens; i++){
         
         printf("\n");                   //std::cout << std::endl; //newline 
@@ -469,7 +496,7 @@ int main() {
             //we will select a start word and a number of tests words.
             //we should  always have the same number of test words in a generation.
             //we cannot go beyond the end of the array. As a side effect, the earliest and last test words will be less likely. 
-        float DictPrcnt = 0.05; //percentage of the dictionary to test at any time.
+        float DictPrcnt = 0.1; //percentage of the dictionary to test at any time.
         const int DictTrialSize = int(dictCount * DictPrcnt);
         int startIndex = rand() % (dictCount - int((dictCount/100) * DictPrcnt) );
 
@@ -484,8 +511,10 @@ int main() {
         //Note number of survivors is important. may see use as start index for mutating samples.
         int survivors = fit_samples(vocabs, centers, scores, testCount, threshold, nextV, nextC, scores2, testCount);
 
-        uint32_t bestKeyA = vocabs[bestIndex];
-        uint32_t bestKeyB = nextV[bestIndex];
+
+        //string filename = "Generation"+ to_string(i)+".csv";
+        //saveGeneration(vocabs, centers, testCount, scores, filename);
+
 
         // Working with the Data
                     //show highest score
@@ -493,16 +522,6 @@ int main() {
                     uint32_t test = centers[bestIndex];
                     //std::cout << "Best Puzzle: " << buffer << " C = "<< char(pow(centers[bestIndex], 0.5)+96) <<" with "<< scores[bestIndex] <<  std::endl; //double endl for space
                     printf("    Best Puzzle: %s C=%c with %6d points", buffer, char(pow(centers[bestIndex], 0.5)+96), scores[bestIndex] );
-
-                    // Debug Statements
-                    //std::cout << "as " << vocabs[bestIndex] << std::endl;
-                    //key_to_string( buffer, next_v[bestIndex]);
-                    //std::cout << "             " << buffer << " is the best here" << std::endl;
-                    //std::cout << "Best Puzzle: [" << buffer << "] C="<< /*next_c[bestIndex] <<*/" with "<< scores[bestIndex] <<  std::endl << std::endl; //double endl for space
-                    //std::cout << "as " << vocabs[bestIndex] << std::endl << std::endl;
-                    //std::cout << vocabs[bestIndex] << " At index " << bestIndex << std::endl;
-                    //compare_key_arrs(vocabs, next_v, test_count);
-
 
                     //organize data to export
                     data[0] = i;
@@ -517,7 +536,6 @@ int main() {
                     char cChar = char(std::log(nextC[bestIndex] >> 1)+96); //extremely simple 1hot to character
                     outfile   << buffer << ','; //write highest scoring vocab to the summary
                     outfile   << std::endl;
-
 
         //generation complete. Prepare next generation 
         mutate_samples_n(vocabs, centers, testCount, threshold, vocabs, centers );

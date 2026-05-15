@@ -142,12 +142,24 @@ int check_dict_cpu(uint32_t * wVecs, int count, uint32_t key, uint32_t centerLet
     return foundCount;
 }
 
-
 /*
-uint32_t * breed(uint32_t key_a, uint32_t cent_a, uint32_t key_b, uint32_t cent_b, int litter){
+* The plan:
+
+
+Outcome:
+
+produce an array of N children.
+    Each child has:
+    One letter removed from existing vocabulary
+    One letter added to vocabulary
+
+*/
+
+uint32_t * breed(uint32_t key_a, uint32_t cent_a, uint32_t key_b, uint32_t cent_b, int litterSize){
 //for now, we will make a single gene swap.
 //map all the "genes" of the 
-}*/
+return 0;
+}
 
 
 /*
