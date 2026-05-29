@@ -2,7 +2,6 @@
 #include <iostream>
 #include <cstdint>
 
-
 void say_hi(){
 
     std::cout << "Hello from genetics.h!" << std::endl;
@@ -82,6 +81,29 @@ int mutate_one(uint32_t key, uint32_t cent, uint32_t * childV, uint32_t * childC
 }
 
 
+
+/*This function turns our uint32_t into a string of 7 characters
+ *
+ * */
+char* key_to_string(char* buffer, uint32_t key){
+    uint32_t k = key; //copy for cleanliness, we will be altering the value
+    int lettersFound = 0; //position
+
+    //uint32_t lint = 1;
+    for(int i=0; i<26;i++){
+      if ( (k % 2) != 0 ) { //is the trailing value 1?
+        //then this letter is in the string!
+        buffer[lettersFound] = char(96+i);
+        lettersFound++;
+      }
+
+      k = k >> 1; //slide... to the right! 
+                //examine the next bit on the next cycle
+    }
+
+    return 0;
+}
+
 /* This function returns the number of 1s in an N-hot vector
 it returns 1 if the key has more than 7 positive bits, and 0 otherwise.
 */
@@ -143,6 +165,31 @@ int check_dict_cpu(uint32_t * wVecs, int count, uint32_t key, uint32_t centerLet
 }
 
 /*
+This is a helper functoin that finds the index of a numbered gene.
+It is often used in random selecton for mutations.
+*/
+int find_Nth_gene(uint32_t puzzle, int N){
+    uint32_t k = puzzle;
+    for(int i=1; i<26; i++){
+        switch (k % 2){ //read least significant bit
+
+            case 1: // Character is Present in our vector
+                N--; //seen one additional    //remove the component of the vector by subtraction.
+                break;
+
+            default: k; //if not a one, do nothing.
+
+        }
+        k = k >> 1;
+        if (N==0){
+            return i-1;
+        }
+    }
+    return 0;
+}
+
+
+/*
 * The plan:
 
 
@@ -150,14 +197,45 @@ Outcome:
 
 produce an array of N children.
     Each child has:
-    One letter removed from existing vocabulary
-    One letter added to vocabulary
+    One letter removed from existing vocabulary of MOTHER
+    One letter added to vocabulary of FATHER.
+
+Rough Plan:
+    Select Nth Feature to add
+    Select Nth Feature to Remove
+    //if these features are identical, we do not care. swapping is faster than IF comparison.
+
+    //there is a 1/7 chance that the center letter will be Lost in the child.
+    //if this is true, then this child will have a score of 0.
+    //oh well, that's evolution, baby!
+
 
 */
-
-uint32_t * breed(uint32_t key_a, uint32_t cent_a, uint32_t key_b, uint32_t cent_b, int litterSize){
+uint32_t * breed(uint32_t key_mom, uint32_t cent_mom, uint32_t key_dad, uint32_t cent_dad, int litterSize){
 //for now, we will make a single gene swap.
-//map all the "genes" of the 
+//map the required genes of the parents
+key_mom = 4493830;
+
+float momI =  static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+float dadI =  static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+
+int momIndex = int(momI * 7) +1; //+1 because cannot be zero, we want to pick an entry from the 1st to 7th gene
+int dadIndex = int(dadI * 7) +1;
+
+int momgeneindex = find_Nth_gene(key_mom, momIndex);
+int dadgeneindex = find_Nth_gene(key_dad, dadIndex);
+
+printf("Gene Index %d", momgeneindex);
+
+char buffer[20];
+
+
+uint32_t child = key_mom - (1<<momgeneindex) + (1<<dadgeneindex);
+key_to_string(buffer, child);
+printf("child, %s\n", buffer);
+
+
+
 return 0;
 }
 

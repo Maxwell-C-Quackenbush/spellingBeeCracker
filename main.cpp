@@ -163,27 +163,6 @@ uint32_t makeKey(string s){
 
 
 
-/*This function turns our uint32_t into a string of 7 characters
- *
- * */
-char* key_to_string(char* buffer, uint32_t key){
-    uint32_t k = key; //copy for cleanliness, we will be altering the value
-    int lettersFound = 0; //position
-
-    //uint32_t lint = 1;
-    for(int i=0; i<26;i++){
-      if ( (k % 2) != 0 ) { //is the trailing value 1?
-        //then this letter is in the string!
-        buffer[lettersFound] = char(96+i);
-        lettersFound++;
-      }
-
-      k = k >> 1; //slide... to the right! 
-                //examine the next bit on the next cycle
-    }
-
-    return 0;
-}
 
 
 
@@ -408,6 +387,8 @@ int main() {
     uint32_t *dict = (uint32_t *) malloc( dictCount * sizeof(uint32_t));
     makeDict(dict, dictCount, vocabs[0]);
 
+
+    breed(vocabs[0], centers[0], vocabs[1], centers[1], 1);
 
     //now we are going to shuffle the dictionary
         //this is useful because it will allow us to easily take RANDOM samples of our dictionary for use in 
