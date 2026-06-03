@@ -9,6 +9,7 @@ using namespace std;
 #include <random> 
 #include <tgmath.h>
 #include "genetics.h"
+#include "helpers.h"
 #include <print>
 #include <format>
 
@@ -251,24 +252,6 @@ int generate_keys(uint32_t vocabs[], uint32_t centers[], int count){
 }
 
 
-int save_arr_to_file(int* arr, int size ){
-
-    ofstream outfile("array.txt");
-    if (!outfile.is_open()) {
-        cerr << "Failed to open file for writing.\n";
-        return 1;
-    }
-    // Writing the array elements to the file
-    for (int i = 0; i < size; ++i) {
-        outfile << arr[i] << " ";
-    }
-
-    // Closing the file
-    outfile.close();
-
-    return 0;
-
-}
 
 
 
