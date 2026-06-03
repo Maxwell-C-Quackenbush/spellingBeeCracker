@@ -67,6 +67,8 @@ int test_key_charcount(uint32_t * keyOriginal){
 }
 
 
+
+
 int save_arr_to_file(int* arr, int size ){
     ofstream outfile("array.txt");
     if (!outfile.is_open()) {
@@ -103,6 +105,22 @@ char* key_to_string(char* buffer, uint32_t key){
 
       k = k >> 1; //slide... to the right! 
                 //examine the next bit on the next cycle
+    }
+
+    return 0;
+}
+
+//Non-functional debug function. turns strings of characters into vectors.
+int xatov(char *s, int len) {
+    int result [10];
+    int i=0;
+    while( i<= 10) {
+
+        int nu = int(s[i]);
+        //-97 because 97 is start of lowercase letters
+        result[i] = nu -96 <= 0? 0 : nu-96 ;
+        printf("iteration %d\n", i);
+        i++;
     }
 
     return 0;
