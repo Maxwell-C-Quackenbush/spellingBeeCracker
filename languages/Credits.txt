@@ -1,0 +1,15 @@
+English
+https://github.com/words/an-array-of-english-words
+
+French
+https://github.com/words/an-array-of-french-words
+
+Dutch
+https://github.com/evanzummeren/an-array-of-dutch-words
+
+Spanish
+https://github.com/words/an-array-of-spanish-words
+
+Malay
+https://github.com/aidilrx04/malay-words
+
